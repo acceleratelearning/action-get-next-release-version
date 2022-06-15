@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { graphql } from '@octokit/graphql'
+import {graphql} from '@octokit/graphql'
 import semver from 'semver'
 
 type Node = {

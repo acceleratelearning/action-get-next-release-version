@@ -72,7 +72,7 @@ function run() {
             const matchingVersions = releases.repository.releases.nodes
                 .filter(node => semver_1.default.satisfies(node.name, `${inputs.majorMinorVersion}.x`))
                 .map(node => node.name)
-                .sort(semver_1.default.compare);
+                .sort(semver_1.default.rcompare);
             const nextVersion = matchingVersions.length === 0
                 ? `${inputs.majorMinorVersion}.0`
                 : semver_1.default.inc(matchingVersions[0], 'patch');
