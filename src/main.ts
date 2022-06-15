@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import {graphql} from '@octokit/graphql'
+import { graphql } from '@octokit/graphql'
+import semver from 'semver'
 
 type Node = {
   name: string
@@ -22,9 +23,7 @@ async function run(): Promise<void> {
 
     core.debug(
       `Looking for releases that match ${inputs.majorMinorVersion} ...`
-    ) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
-
-    //const octokit = github.getOctokit(inputs.githubToken)
+    )
 
     const query = `query Releases($owner: String!, $repo: String!) {
       repository(owner:$owner, name:$repo) {
@@ -42,15 +41,17 @@ async function run(): Promise<void> {
       }
     })
 
-    const pulls = await graphqlClient<Releases>(query, github.context.repo)
+    const releases = await graphqlClient<Releases>(query, github.context.repo)
 
-    const matchingVersions = pulls.repository.releases.nodes.map(
+    const matchingVersions = releases.repository.releases.nodes.filter(node => semver.satisfies(node.name, `${inputs.majorMinorVersion}.x`)).map(
       node => node.name
-    )
+    ).sort(semver.compare)
 
-    core.debug(`Releases: ${matchingVersions}`)
+    const nextVersion = (matchingVersions.length == 0) ? `${inputs.majorMinorVersion}.0` : semver.inc(matchingVersions[0], "patch")
 
-    core.info(`Releases: ${matchingVersions}`)
+    core.debug(`Releases: ${nextVersion}`)
+
+    core.info(`Releases: ${nextVersion}`)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
