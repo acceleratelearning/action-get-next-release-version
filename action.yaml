@@ -1,0 +1,18 @@
+name: Get Next Release Version
+description: Determines the next version number based on existing releases
+author: Rob Cannon
+inputs:
+  major-minor-version:
+    required: false
+    description: The Major and Minor version numbers to use
+    default: "0.1"
+  milliseconds: # change this
+    required: true
+    description: "input description here"
+    default: "default value if applicable"
+outputs:
+  version:
+    description: The next version to use
+runs:
+  using: "node16"
+  main: "dist/index.js"
