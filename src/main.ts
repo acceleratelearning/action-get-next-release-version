@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { graphql } from '@octokit/graphql'
+import {graphql} from '@octokit/graphql'
 import semver from 'semver'
 
 type Node = {
@@ -43,11 +43,17 @@ async function run(): Promise<void> {
 
     const releases = await graphqlClient<Releases>(query, github.context.repo)
 
-    const matchingVersions = releases.repository.releases.nodes.filter(node => semver.satisfies(node.name, `${inputs.majorMinorVersion}.x`)).map(
-      node => node.name
-    ).sort(semver.compare)
+    const matchingVersions = releases.repository.releases.nodes
+      .filter(node =>
+        semver.satisfies(node.name, `${inputs.majorMinorVersion}.x`)
+      )
+      .map(node => node.name)
+      .sort(semver.compare)
 
-    const nextVersion = (matchingVersions.length == 0) ? `${inputs.majorMinorVersion}.0` : semver.inc(matchingVersions[0], "patch")
+    const nextVersion =
+      matchingVersions.length === 0
+        ? `${inputs.majorMinorVersion}.0`
+        : semver.inc(matchingVersions[0], 'patch')
 
     core.debug(`Releases: ${nextVersion}`)
 
