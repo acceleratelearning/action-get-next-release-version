@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import {graphql} from '@octokit/graphql'
+import { graphql } from '@octokit/graphql'
 import semver from 'semver'
 
 type Node = {
@@ -48,7 +48,7 @@ async function run(): Promise<void> {
         semver.satisfies(node.name, `${inputs.majorMinorVersion}.x`)
       )
       .map(node => node.name)
-      .sort(semver.compare)
+      .sort(semver.rcompare)
 
     const nextVersion =
       matchingVersions.length === 0
