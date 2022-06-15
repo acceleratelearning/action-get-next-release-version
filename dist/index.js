@@ -54,9 +54,11 @@ function run() {
                 majorMinorVersion: core.getInput('major-minor-version')
             };
             core.debug(`Looking for releases that match ${inputs.majorMinorVersion} ...`);
+            // Use graphql to get release.  I would love to use it to filter the releases in this query and get the
+            // latest one, but I can't figure out how.  This stuff is way under-documented
             const query = `query Releases($owner: String!, $repo: String!) {
       repository(owner:$owner, name:$repo) {
-        releases(last: 100, orderBy: {field: CREATED_AT, direction: DESC}) {
+        releases(last: 100, orderBy: {field: NAME, direction: DESC}) {
           nodes {
             name
           }
@@ -73,11 +75,9 @@ function run() {
                 .filter(node => semver_1.default.satisfies(node.name, `${inputs.majorMinorVersion}.x`))
                 .map(node => node.name)
                 .sort(semver_1.default.rcompare);
-            const nextVersion = matchingVersions.length === 0
-                ? `${inputs.majorMinorVersion}.0`
-                : semver_1.default.inc(matchingVersions[0], 'patch');
-            core.debug(`Releases: ${nextVersion}`);
-            core.info(`Releases: ${nextVersion}`);
+            const nextVersion = matchingVersions.length === 0 ? `${inputs.majorMinorVersion}.0` : semver_1.default.inc(matchingVersions[0], 'patch');
+            core.info(`The next release should be: ${nextVersion}`);
+            core.setOutput('version', nextVersion);
         }
         catch (error) {
             if (error instanceof Error)

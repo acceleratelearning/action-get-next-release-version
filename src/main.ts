@@ -21,13 +21,13 @@ async function run(): Promise<void> {
       majorMinorVersion: core.getInput('major-minor-version')
     }
 
-    core.debug(
-      `Looking for releases that match ${inputs.majorMinorVersion} ...`
-    )
+    core.debug(`Looking for releases that match ${inputs.majorMinorVersion} ...`)
 
+    // Use graphql to get release.  I would love to use it to filter the releases in this query and get the
+    // latest one, but I can't figure out how.  This stuff is way under-documented
     const query = `query Releases($owner: String!, $repo: String!) {
       repository(owner:$owner, name:$repo) {
-        releases(last: 100, orderBy: {field: CREATED_AT, direction: DESC}) {
+        releases(last: 100, orderBy: {field: NAME, direction: DESC}) {
           nodes {
             name
           }
@@ -44,20 +44,15 @@ async function run(): Promise<void> {
     const releases = await graphqlClient<Releases>(query, github.context.repo)
 
     const matchingVersions = releases.repository.releases.nodes
-      .filter(node =>
-        semver.satisfies(node.name, `${inputs.majorMinorVersion}.x`)
-      )
+      .filter(node => semver.satisfies(node.name, `${inputs.majorMinorVersion}.x`))
       .map(node => node.name)
       .sort(semver.rcompare)
 
     const nextVersion =
-      matchingVersions.length === 0
-        ? `${inputs.majorMinorVersion}.0`
-        : semver.inc(matchingVersions[0], 'patch')
+      matchingVersions.length === 0 ? `${inputs.majorMinorVersion}.0` : semver.inc(matchingVersions[0], 'patch')
 
-    core.debug(`Releases: ${nextVersion}`)
-
-    core.info(`Releases: ${nextVersion}`)
+    core.info(`The next release should be: ${nextVersion}`)
+    core.setOutput('version', nextVersion)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
