@@ -77,7 +77,7 @@ function run() {
                 .sort(semver_1.default.rcompare);
             const nextVersion = matchingVersions.length === 0 ? `${inputs.majorMinorVersion}.0` : semver_1.default.inc(matchingVersions[0], 'patch');
             core.info(`The next release should be: ${nextVersion}`);
-            core.setOutput('version', nextVersion);
+            core.setOutput('next-version', nextVersion);
         }
         catch (error) {
             if (error instanceof Error)

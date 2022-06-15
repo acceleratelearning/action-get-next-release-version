@@ -10,7 +10,7 @@ inputs:
     description: The Major and Minor version numbers to use
     default: "0.1"
 outputs:
-  version:
+  next-version:
     description: The next version to use
 runs:
   using: "node16"

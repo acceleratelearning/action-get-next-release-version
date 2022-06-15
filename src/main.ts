@@ -52,7 +52,7 @@ async function run(): Promise<void> {
       matchingVersions.length === 0 ? `${inputs.majorMinorVersion}.0` : semver.inc(matchingVersions[0], 'patch')
 
     core.info(`The next release should be: ${nextVersion}`)
-    core.setOutput('version', nextVersion)
+    core.setOutput('next-version', nextVersion)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

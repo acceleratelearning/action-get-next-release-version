@@ -10,10 +10,10 @@ on:
     branches:
       - main
     paths-ignore:
-      - '**.md'
+      - "**.md"
   pull_request:
     paths-ignore:
-      - '**.md'
+      - "**.md"
   workflow_dispatch:
 
 jobs:
@@ -44,6 +44,18 @@ jobs:
             exit 1
           fi
         id: diff
+
+      - name: Get Next Release Version
+        id: get-next-release-version
+        uses: ./
+        with:
+          major-minor-version: "1.0"
+
+      - name: Publish GitHub Release
+        id: publish-release
+        uses: acceleratelearning/publish-github-release-action@main
+        with:
+          version: "${{ steps.get-next-release-version.outputs.next-version }}"
 
       # If index.js was different than expected, upload the expected version as an artifact
       - uses: actions/upload-artifact@v3
