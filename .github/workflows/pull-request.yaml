@@ -1,9 +1,10 @@
-name: Build and Test
+name: Pull Request Checks
 on: # rebuild any PRs and main branch changes
   pull_request:
 
 jobs:
   build:
+    name: Build Project
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -31,6 +32,7 @@ jobs:
         id: diff
 
   test: # make sure the action works on a clean machine without building
+    name: Test Project
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
