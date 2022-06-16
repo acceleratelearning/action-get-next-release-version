@@ -1,4 +1,7 @@
 {
+    "git.branchProtection": [
+        "main"
+    ],
 	"recommendations": [
 		"esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint"
